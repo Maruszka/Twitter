@@ -4,7 +4,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "coderslab";
-$baseName = "Twitter_db";
+$baseName = "Twitter";
 
 //Tworzenie nowego polaczneia:
 $conn  = new mysqli($servername, $username, $password, $baseName);
