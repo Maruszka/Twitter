@@ -34,21 +34,17 @@ session_start();
 if(!isset($_SESSION['loggedUserId'])){
     header("Location: login.php"); //instrukcja do przekierowania
 }
-$userId = $_SESSION['loggedUserId'];
 $user = User::getUserById($conn, $_SESSION['loggedUserId']);
 $userName = $user->getFullName();
-
-    $receiverId = $_SESSION['loggedUserId'];    
-
-
-
+$userId = $_SESSION['loggedUserId'];
+$senderId = $_SESSION['loggedUserId'];
 ?>
 
 
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Inbox</title>
+  <title>Outbox</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -92,17 +88,17 @@ $userName = $user->getFullName();
                     <thead class="hidden-xs">
                         <tr>
                         <td class="col-sm-3"><a href=""><strong>Date / Time</strong></a></td>
-                        <td class="col-sm-2"><a href=""><strong>Sender</strong></a></td>
+                        <td class="col-sm-2"><a href=""><strong>Receiver</strong></a></td>
                         <td class="col-sm-5"><a href=""><strong>Message</strong></a></td>
                         </td>
                         </tr>
                     </thead>
                     <tbody>
-                    <?php $result = Message::loadMessageByReceiverId($conn, $receiverId);
-                        foreach($result as $key => $message){
-                                $message->showMessage();
-                        }
-                    ?>
+                        <?php $result = Message::loadMessageBySenderId($conn, $senderId);
+                            foreach($result as $key => $message){
+                                $message->showSendMessage();
+                            }
+                         ?>
                     </tbody>
                 </table>
             </div>

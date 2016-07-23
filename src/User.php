@@ -40,6 +40,24 @@ class User{
         }
     }
     
+    static public function getUserById(mysqli $conn, $userId){
+        $sql = "SELECT * FROM User WHERE id = $userId";
+        $result = $conn->query($sql);
+    
+        if($result->num_rows >0){
+            $row = $result->fetch_assoc();
+            $user = new User();
+            $user->setID($row['id']);
+            $user->setFullName($row['fullName']);
+            $user->setEmail($row['email']);
+            
+            return $user;
+        } else {
+            
+            return false;
+        }
+    }
+    
     private $id;
     private $email;
     private $password;
@@ -93,6 +111,20 @@ class User{
         return $this->active;
     }
     
+    public function show(){
+        echo( "<div class='panel-heading'>Information about user</div>");
+        echo("<div class='panel-body'>"
+                . "User name: $this->fullName"
+                . "User id:$this->id"
+                . "Email:$this->email"
+                . "</div>");
+       /* echo("<div class='panel-footer'>"
+                . "<a href='showTweet.php?tweetId=$this->id' class='btn btn-primary btn-sm' role='button'>Add Comment </a>"
+                . "<a href='showTweet.php?tweetId=$this->id'class='btn btn-info btn-sm' role='button'>All Cmments  <span class='badge'>5</span></a>"
+                . "<br></div>)");*/
+           
+    }
+    
     public function saveToDB(mysqli $conn){
       //wszystkie atrybuty obiektu mamay w Bazie Danych
        //jezeli uzytkownik ma id =-1 to znaczy ze nie istnieje i mozna go stworzyc
@@ -129,8 +161,22 @@ class User{
         
     }
     
+    public function loadFromDB(mysqli $conn, $userId) {
+        $sql = "SELECT * FROM User WHERE id = $userId";
+        $result = $conn->query($sql);
+        if($result !== false && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $this->id = $row['id'];
+            $this->email = $row['email'];
+            $this->fullName = $row['fullName'];
+            $this->active = $row['active'];
+            return true;
+        }
+        return false;
+    }
+    
     public function loadAllTweets(mysqli $conn) {
-        $userTweets = Tweet::loadUserTweetsFromDb($conn, $this->id);
+        return Tweet::getAllTweetsByUserId($conn, $this->id);
         
     }
     

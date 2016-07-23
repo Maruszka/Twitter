@@ -1,34 +1,32 @@
 <?php
 
+
 class Tweet {
     
     
 
-    static public function loadUserTweetsFromDb(mysqli $conn, $userId){
+    static public function getAllTweetsByUserId(mysqli $conn, $userId){
       
-        $sql = "SELECT * FROM Tweet WHERE user_id = $userId ORDER BY Tweet.id DESC" ;
+        $sql = "SELECT Tweet.id, Tweet.user_id, Tweet.tweet, User.fullName FROM Tweet LEFT JOIN User ON Tweet.user_id = User.id WHERE Tweet.user_id = 3 ORDER BY Tweet.id DESC" ;
         $result = $conn->query($sql);
         if($result->num_rows > 0 ){
             $tweets = array();
             
-            foreach($result as $key => $row ){
+            while($row = $result->fetch_assoc()) {
                 $newTweet = new Tweet();
-                $newTweet->setUserId($row['user_id']);               
-                $newTweet->setTweet($row['tweet']);
-                
-                $tweets[] = $newTweet;            
+                $newTweet->id = $row['id'];
+                $newTweet->userId = $row['user_id'];
+                $newTweet->tweet = $row['tweet'];
+                $newTweet->fullName = $row['fullName'];
+                $tweets[] = $newTweet;
+         
             }
             return $tweets;            
         }
         return [];
     
     }
-    public function insertTweetToDB(mysqli $conn){
     
-        $sql = "INSERT INTO Tweet (user_id, tweet)
-                   VALUES ('$this->userId','$this->tweet')";
-        $conn->query($sql);  
-    }
     
     private $id;
     private $userId;
@@ -58,22 +56,27 @@ class Tweet {
         $this->tweet = $newTweet;
     }
     
-     
-    public function showOneTweet (mysqli $conn, $tweetId){
-        
-       $sql = "SELECT user_id, text FROM Tweet Where Tweet.id = $tweetId ";
-       $result = $conn->query($sql);
-               if($result->num_rows > 0){
+     public function loadTweetById(mysqli $conn, $tweetId) {
+        $sql = "SELECT Tweet.id, Tweet.user_id, Tweet.tweet, User.fullName FROM Tweet LEFT JOIN User ON Tweet.user_id = User.id WHERE Tweet.id = $tweetId";
+        $result = $conn->query($sql);
+        if($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            echo "<fieldset>";
-            echo "id" .$row['id'];
-            echo "tweet:" . $row['tweet'];
-            echo "author: ". $row['user_id'];
-            echo "</fieldset>";
+            $this->id = $row['id'];
+            $this->userId = $row['user_id'];
+            $this->tweet = $row['tweet'];
+            $this->fullName = $row['fullName'];
+            return true;
         }
+        return false;
     }
     
-
+        
+    public function insertTweetToDB(mysqli $conn){
+    
+        $sql = "INSERT INTO Tweet (user_id, tweet)
+                   VALUES ('$this->userId','$this->tweet')";
+        $conn->query($sql);  
+    }
     
     public function updateTweetToDB(mysqli $conn){
         $sql = "UPDATE Tweet SET
@@ -85,13 +88,28 @@ class Tweet {
     }      
     
     public function showTweet(){
-       
-            echo "<p> Author: ". $this->userId.": ". $this->tweet ."</p>";
+        
+        echo( "<div class='panel-heading'>$this->fullName said:</div>");
+        echo("<div class='panel-body'>$this->tweet</div>");
+        echo("<div class='panel-footer'>"
+                . "<a href='showTweet.php?tweetId=$this->id' class='btn btn-primary btn-sm' role='button'>Add Comment </a>"
+                . "<a href='showTweet.php?tweetId=$this->id'class='btn btn-info btn-sm' role='button'>All Cmments  <span class='badge'>5</span></a>"
+                . "<br></div>)");
+           
+
 
     }
- 
-    public function getAllComments(){
+    
+    public function showTweetText(){      
+       
+        echo("<div class='panel-body'>Tweet text: $this->tweet</div>");
 
+  
+    }
+ 
+ 
+    public function getAllComments(mysqli $conn){
+        return Comment:: getAllCommentsByTweetId($conn, $this->id);
     }
     
     

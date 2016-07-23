@@ -1,30 +1,9 @@
 <?php
 
-/* 
- Użytkownik ma mieć możliwość wyświetlenia listy
-
-wiadomości, które otrzymał i wysłał.
-
- Wiadomości wysłane mają wyświetlać
-
-odbiorcę, datę wysłania i początek wiadomości
-
-(pierwsze 30 znaków).
-
- Wiadomości odebrane mają wyświetlać
-
-nadawcę, datę wysłania i początek wiadomości
-
-(pierwsze 30 znaków).
-
-Wiadomości jeszcze nieprzeczytane powinny być
-
-jakoś oznaczone.
- */
-
 require_once 'src/connection.php';
 require_once 'src/User.php';
 require_once 'src/Tweet.php';
+require_once 'src/Comment.php';
 require_once 'src/Message.php';
 
 //logowanie na mechanizamie sesji
@@ -34,21 +13,18 @@ session_start();
 if(!isset($_SESSION['loggedUserId'])){
     header("Location: login.php"); //instrukcja do przekierowania
 }
-$userId = $_SESSION['loggedUserId'];
 $user = User::getUserById($conn, $_SESSION['loggedUserId']);
 $userName = $user->getFullName();
-
-    $receiverId = $_SESSION['loggedUserId'];    
-
-
+$newMessage = new Message();
 
 ?>
+
 
 
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Inbox</title>
+  <title>Show tweet</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -84,10 +60,11 @@ $userName = $user->getFullName();
   </div>
 </nav>
     <div class="container text-center">
-
-        <div class="panel panel-default inbox" >
-
-            <div class="table-responsive">
+        <div class="row">
+            <div class="panel panel-info">
+            <div class="panel-heading">Author: <?php echo $userName;?> </div>
+            <div class="panel-body">
+                <div class="table-responsive">
                 <table class="table table-striped table-hover refresh-container pull-down">
                     <thead class="hidden-xs">
                         <tr>
@@ -97,18 +74,28 @@ $userName = $user->getFullName();
                         </td>
                         </tr>
                     </thead>
-                    <tbody>
-                    <?php $result = Message::loadMessageByReceiverId($conn, $receiverId);
-                        foreach($result as $key => $message){
-                                $message->showMessage();
-                        }
-                    ?>
+                    <tbody> 
+             <?php
+             if($_SERVER['REQUEST_METHOD'] == 'GET'){
+ 
+                
+                $newMessage->loadMessageFromDB($conn, $_GET['messageId']);
+                $newMessage->showMessage();
+                $newMessage->changeStatus($conn, $_GET['messageId']);
+                
+                
+                
+             }                      
+                   
+             ?>
                     </tbody>
                 </table>
             </div>
+            </div>
+ 
+            </div>
         </div>
         
-    </div>
 <footer class="container-fluid text-center">
   <p>tweet tweet tweet</p>
 </footer>
@@ -116,3 +103,5 @@ $userName = $user->getFullName();
 </body>
 </html>
   
+
+

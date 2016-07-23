@@ -16,7 +16,7 @@ CREATE TABLE Tweet (
     ON DELETE CASCADE
 );
 
-INSERT INTO `Message`(`user_id`, `text`) VALUES (2, 'Tweet Tweet tweet nr 1')
+
 
 CREATE TABLE Comment (
     id INT AUTO_INCREMENT,
@@ -32,10 +32,13 @@ CREATE TABLE Comment (
 
 CREATE TABLE Message (
     id INT AUTO_INCREMENT,
-    sender_id INT NOT NULL ,
-    receiver_id INT NOT NULL,
-    creation_date DATETIME,  
-    message VARCHAR(255),
-    status TINYINT,
-    PRIMARY KEY(id)
+    sender_id INT,
+    receiver_id INT,
+    message TEXT NOT NULL,
+    status TINYINT DEFAULT 1,
+    date DATETIME,
+    PRIMARY KEY(id),
+    FOREIGN KEY(sender_id) REFERENCES User(id),
+    FOREIGN KEY(receiver_id) REFERENCES User(id)
+)
 );

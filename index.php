@@ -10,6 +10,37 @@ session_start();
 if(!isset($_SESSION['loggedUserId'])){
     header("Location: login.php"); //instrukcja do przekierowania
 }
+$userId = $_SESSION['loggedUserId'];
+$user = User::getUserById($conn, $_SESSION['loggedUserId']);
+$userName = $user->getFullName();
+
+
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+    
+  
+    $tweet = isset($_POST['tweet']) ? $conn->real_escape_string(trim($_POST['tweet'])) : '';
+    
+    
+    if(strlen($tweet) > 0) {
+        if(strlen($tweet) <= 140) {
+            $newTweet = new Tweet();
+            $newTweet->setUserId($_SESSION['loggedUserId']);
+            $newTweet->setTweet($tweet);
+            $newTweet->insertTweetToDB($conn);
+            
+
+        }
+        else {
+            echo "<div class='alert alert-danger'>Your Tweet is too long. It cannot extend 140 characters.</div>";
+        }
+    }
+    else {
+        echo "<div class='alert alert-danger'>You cannot add empty Tweet.</div>";
+    }
+}
+
+
+
 
 ?>
 
@@ -35,19 +66,21 @@ if(!isset($_SESSION['loggedUserId'])){
       <a class="navbar-brand" href="#">Twitter</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="index.php">Home</a></li>
-        <li><a href="showTweet.php">Tweets</a></li>
-        <li><a href="inbox.php">Inbox</a></li>
-        <li><a href="sendMessage.php">Send message</a></li>
-      </ul>
-      
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Id:<?php echo $_SESSION['loggedUserId'].'<br>';?> </a></li>
-        <li><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-        
-        
-      </ul>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="index.php">Home</a></li>
+        </ul>   
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-envelope"></span> Mail <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="sendMessage.php?senderId={$_SESSION['loggedUserId']}">Compose message</a></li>
+                    <li><a href="inbox.php?receiverId={$_SESSION['loggedUserId']}">Inbox</a></li>
+                    <li><a href="outbox.php?senderId={$_SESSION['loggedUserId']}">Outbox</a></li>
+                </ul>
+            </li>
+            <li><a href="myProfile.php"><span class="glyphicon glyphicon-user"></span> <?php echo $userName;?> </a></li>
+            <li><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        </ul>
     </div>
   </div>
 </nav>
@@ -70,21 +103,6 @@ if(!isset($_SESSION['loggedUserId'])){
                   <button class="btn btn-primary" type="submit" name="submit">Tweet!</button>
                   
                 </form>
-                
-                
-                    <?php
-
-                    if(isset($_POST['submit']) && strlen($_POST['tweet'])<141){
-
-                      $newTweet = new Tweet();
-                      $newTweet->setUserId($_SESSION['loggedUserId']);
-                      $newTweet->setTweet($_POST['tweet']);
-                      $newTweet->insertTweetToDB($conn);
-                      
-//                  }else{
-//                      echo"Your tweet is too long";
-                  }
-                  ?>
             </div>
           </div>
         </div>
@@ -95,15 +113,17 @@ if(!isset($_SESSION['loggedUserId'])){
           <div class="panel panel-default text-left">
             <div class="panel-body">
                 <p>Your all tweets:</p><br>
+                <div class='panel panel-info'>
                     <?php
 
-                    $result = Tweet::loadUserTweetsFromDb($conn, $_SESSION['loggedUserId']);
+                    $result = Tweet::getAllTweetsByUserId($conn, $_SESSION['loggedUserId']);
                     
                     foreach($result as $key => $tweet){
                         $tweet->showTweet();
                         
                     }
                     ?>
+                </div>
 
             </div>
           </div>
