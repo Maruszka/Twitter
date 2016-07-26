@@ -38,6 +38,7 @@ class Message{
                 $message->receiverId = $val['receiver_id'];
                 $message->message = $val['message'];
                 $message->status = $val['status'];
+                $message->date = $val['date'];
                 $messages[] = $message;
             }
             return $messages;
@@ -53,6 +54,7 @@ class Message{
     private $senderId;
     private $status;
     private $message;
+    private $date;
 
 
     public function __construct(){
@@ -60,8 +62,8 @@ class Message{
         $this->receiverId = 0;
         $this->senderId = 0;
         $this->status = 0; //nieprzeczytana
-        $this-> message = '';
-        $this->date = 0;
+        $this->message = '';
+        $this->date = '0-0-0 0-0-0';
     }
     
     public function getId(){
@@ -90,10 +92,16 @@ class Message{
         $this->senderId = is_numeric($newSenderId) ? $newSenderId : -1;
     }    
     public function getMessage(){
-       return $this-> message;
+       return $this->message;
     }
     public function setMessage($newMessage){
         $this->message = $newMessage;
+    }
+    public function getDate(){
+       return $this->date;
+    }
+    public function setDate($newDate){
+        $this->date = $newDate;
     }
     public function getStatus(){
        return $this-> status;
@@ -103,15 +111,14 @@ class Message{
             $this->status = $newStatus;
         }else {
             return false;
-        }
-        
+        }   
     }
     
      
     
     public function saveMessageToDB(mysqli $conn){
         if($this->id == -1){
-            $sql = "INSERT INTO Message(sender_id, receiver_id, message, status, date) VALUES($this->senderId, $this->receiverId, '$this->message', $this->status, $this->date)";
+            $sql = "INSERT INTO Message(sender_id, receiver_id, message, status, date) VALUES($this->senderId, $this->receiverId, '$this->message', $this->status, '$this->date')";
             
             if($conn->query($sql)){
                 $this->id = $conn->insert_id;
@@ -141,38 +148,65 @@ class Message{
             return false;
         }
     }
+    public function showMessage(mysqli $conn){
+        $user = User::getUserById($conn, $this->senderId);
+        $senderName = $user->getFullName();
 
-    public function showMessage(){
         
         echo( "<tr><td class='col-sm-3 col-xs-4'><a href='showMessage.php?messageId=$this->id'>$this->date</a></td>"
-            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $this->senderId</a></td>"
+            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $senderName</a></td>"
             ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $this->message </a></td></tr><br>");
     
 
         
-    }
-        public function showSendMessage(){
+    } 
+    public function wordWraper($newMessage){
+        
+    $text = explode(' ', $newMessage);
+    
+    $textSlice = array_slice($text, 0, 30);
+    $wordsWrap = implode(' ',$textSlice);
+    
+    return $wordsWrap;
+}
+
+    public function showReceivedMessage(mysqli $conn){
+        $user = User::getUserById($conn, $this->senderId);
+        $senderName = $user->getFullName();
+        $shortenMessage = $this->wordWraper($this->message);
+
         
         echo( "<tr><td class='col-sm-3 col-xs-4'><a href='showMessage.php?messageId=$this->id'>$this->date</a></td>"
-            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $this->receiverId</a></td>"
-            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $this->message </a></td></tr><br>");
+            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $senderName</a></td>"
+            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'>$shortenMessage  </a></td></tr><br>");
     
 
         
     }
-     public function changeStatus(mysqli $conn, $messageId){
+    
+    
+    public function showSendMessage(mysqli $conn){
+        
+        $user = User::getUserById($conn, $this->receiverId);
+        $receiverName = $user->getFullName();
+        $shortenMessage = $this->wordWraper($this->message);
+        
+        echo( "<tr><td class='col-sm-3 col-xs-4'><a href='showMessage.php?messageId=$this->id'>$this->date</a></td>"
+            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $receiverName</a></td>"
+            ."<td class='col-sm-2 col-xs-4'><a href='showMessage.php?messageId=$this->id'> $shortenMessage </a></td></tr><br>");
+    
+
+        
+    }
+    public function changeStatus(mysqli $conn, $messageId){
         $sql="UPDATE Message SET
         Message.status = 1 WHERE Message.id = $messageId";                 
         $conn->query($sql);
-            
-
-        
-     }
+    }
 
 
     
 }    
     
 
-
-?>
+  ?>

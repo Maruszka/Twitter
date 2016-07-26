@@ -1,14 +1,5 @@
 <?php
 
-/* 
-Użytkownik ma mieć możliwość edycji informacji
-
-o sobie i zmiany hasła. Pamiętaj o tym,
-
-że użytkownik może edytować tylko i wyłącznie
-
-swoje informację.
- */
 
 require_once 'src/connection.php';
 require_once 'src/User.php';
@@ -24,7 +15,6 @@ if(!isset($_SESSION['loggedUserId'])){
 $user = User::getUserById($conn, $_SESSION['loggedUserId']);
 $userId = $_SESSION['loggedUserId'];
 $userName = $user->getFullName();
-
 $userEmail = $user->getEmail();
 
 ?>
@@ -73,34 +63,40 @@ $userEmail = $user->getEmail();
             <h3>Personal info</h3>
                 <form class="form-horizontal" role="form" action ="#" method="POST">
                   <div class="form-group">
+                    <label class="col-lg-3 control-label">User Id:</label>
+                    <div class="col-lg-8">
+                        <input class="form-control" value="<?php echo $userId?>" placeholder="<?php echo $userId?>" type="text">
+                    </div>
+                  </div>
+                  <div class="form-group">
                     <label class="col-lg-3 control-label">Full Name:</label>
                     <div class="col-lg-8">
-                        <input class="form-control" value="<?php echo $userName?>" placeholder="<?php echo $userName?>" type="text">
+                        <input class="form-control" name="newFullNsme" value="<?php echo $userName?>" placeholder="<?php echo $userName?>" type="text">
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-lg-3 control-label">Email:</label>
                     <div class="col-lg-8">
-                        <input class="form-control" value="<?php echo $userEmail?>" placeholder="<?php echo $userEmail?>" type="text">
+                        <input class="form-control" name="newEmail" value="<?php echo $userEmail?>" placeholder="<?php echo $userEmail?>" type="text">
                     </div>
                   </div>
                   
                   <div class="form-group">
                     <label class="col-md-3 control-label">Password:</label>
                     <div class="col-md-8">
-                      <input class="form-control" value="11111122333" type="password">
+                      <input class="form-control" name='newPassword' value="11111122333" type="password">
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-md-3 control-label">Confirm password:</label>
                     <div class="col-md-8">
-                      <input class="form-control" value="11111122333" type="password">
+                      <input class="form-control" name='newPasswordConfirmation' value="11111122333" type="password">
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-md-3 control-label"></label>
                     <div class="col-md-8">
-                      <input class="btn btn-primary" value="Save Changes" type="button">
+                      <input class="btn btn-primary" value="Save" type="button">
                       <span></span>
                       <input class="btn btn-default" value="Cancel" type="reset">
                     </div>
@@ -119,6 +115,9 @@ $userEmail = $user->getEmail();
 
 </body>
 </html>
-  
+  <?php
+  $conn->close();
+  $conn = null;
+  ?>
   
 

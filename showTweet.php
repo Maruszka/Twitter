@@ -31,13 +31,11 @@ $newTweet = new Tweet();
 
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     $tweetId = intval($_GET['tweetId']);
-
 }
 
-
 if(($_SERVER['REQUEST_METHOD'] == 'POST') && $_POST['Add']){
-    $tweetId = intval($_GET['tweetId']);
     
+    $tweetId = intval($_GET['tweetId']);
     $userId = $_SESSION['loggedUserId'];
     $creationDate = date('Y-m-d H-i-s');
     $comment = isset($_POST['comment']) ? $conn->real_escape_string(trim($_POST['comment'])) : '';
@@ -57,7 +55,6 @@ if(($_SERVER['REQUEST_METHOD'] == 'POST') && $_POST['Add']){
     }  else {
         echo "<div class='alert alert-danger'>You cannot add empty comment.</div>";
     }
-
 
 }
 
@@ -112,7 +109,6 @@ if(($_SERVER['REQUEST_METHOD'] == 'POST') && $_POST['Add']){
              <?php
              if($_SERVER['REQUEST_METHOD'] == 'GET'){
  
-                
                 $newTweet->loadTweetById($conn, $_GET['tweetId']);
                 $newTweet->showTweetText();
              }                      
@@ -126,13 +122,13 @@ if(($_SERVER['REQUEST_METHOD'] == 'POST') && $_POST['Add']){
             <div class="panel panel-danger">
                 
                 <div class="panel-body">
-                    <?php
+                <?php
                     $comments = Comment::getAllCommentsByTweetId($conn, $tweetId);
                     foreach($comments as $oneComment) {
-                    $oneComment->showComment();
+                        $oneComment->showComment();
 
                     }
-                 ?>
+                ?>
                 </div>
                 <p> All comments to the tweet <span class='badge'><?php echo count($comments); ?></span></p>
         <div class="row">
@@ -152,6 +148,11 @@ if(($_SERVER['REQUEST_METHOD'] == 'POST') && $_POST['Add']){
 
 </body>
 </html>
+<?php
   
+  $conn->close();
+  $conn = null;
+  
+?>
 
 

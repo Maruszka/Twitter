@@ -19,14 +19,11 @@ class Comment {
                 $newComment->comment = $row['comment'];
                 $newComment->fullName = $row['fullName'];
                 $comments[] = $newComment;
-         
             }
             return $comments;            
         }
         echo "There's no comments to this tweet";
         return[];
-    
-    
     }
     
     private $id;
@@ -73,15 +70,14 @@ class Comment {
         $sql = "INSERT INTO Comment (user_id, tweet_id, creation_date, comment)
        VALUES ('$this->userId','$this->tweetId', '$this->creationDate', '$this->comment')";
         $conn->query($sql); 
-     
     }
     
     public function updateComment(){
         $sql = "UPDATE Comment SET
         comment = '{$this->comment}' WHERE id = '{$this->id}'";                 
-        $conn->query($sql);  
-        
+        $conn->query($sql);     
     }
+    
     public function showComment(){
         echo("<div class = 'panel panel-warning'>"
                 . "<div class='panel-heading'>$this->fullName added a comment no $this->id on $this->creationDate</div>"
@@ -94,3 +90,6 @@ class Comment {
     
     
 }
+
+
+  ?>

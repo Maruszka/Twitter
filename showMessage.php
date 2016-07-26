@@ -24,7 +24,7 @@ $newMessage = new Message();
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Show tweet</title>
+  <title>Show message</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -75,19 +75,15 @@ $newMessage = new Message();
                         </tr>
                     </thead>
                     <tbody> 
-             <?php
-             if($_SERVER['REQUEST_METHOD'] == 'GET'){
- 
-                
-                $newMessage->loadMessageFromDB($conn, $_GET['messageId']);
-                $newMessage->showMessage();
-                $newMessage->changeStatus($conn, $_GET['messageId']);
-                
-                
-                
-             }                      
+            <?php
+                if($_SERVER['REQUEST_METHOD'] == 'GET'){
+      
+                    $newMessage->loadMessageFromDB($conn, $_GET['messageId']);
+                    $newMessage->showMessage($conn);
+                    $newMessage->changeStatus($conn, $_GET['messageId']);   
+                    }                      
                    
-             ?>
+            ?>
                     </tbody>
                 </table>
             </div>
@@ -103,5 +99,10 @@ $newMessage = new Message();
 </body>
 </html>
   
-
+  <?php
+  
+  $conn->close();
+  $conn = null;
+  
+  ?>
 

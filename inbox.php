@@ -34,13 +34,11 @@ session_start();
 if(!isset($_SESSION['loggedUserId'])){
     header("Location: login.php"); //instrukcja do przekierowania
 }
+
 $userId = $_SESSION['loggedUserId'];
 $user = User::getUserById($conn, $_SESSION['loggedUserId']);
 $userName = $user->getFullName();
-
-    $receiverId = $_SESSION['loggedUserId'];    
-
-
+$receiverId = $_SESSION['loggedUserId'];    
 
 ?>
 
@@ -100,7 +98,7 @@ $userName = $user->getFullName();
                     <tbody>
                     <?php $result = Message::loadMessageByReceiverId($conn, $receiverId);
                         foreach($result as $key => $message){
-                                $message->showMessage();
+                                $message->showReceivedMessage($conn);
                         }
                     ?>
                     </tbody>
@@ -115,4 +113,9 @@ $userName = $user->getFullName();
 
 </body>
 </html>
+  <?php
   
+  $conn->close();
+  $conn = null;
+  
+  ?>

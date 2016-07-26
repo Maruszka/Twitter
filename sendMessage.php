@@ -18,6 +18,7 @@ session_start();
 if(!isset($_SESSION['loggedUserId'])){
     header("Location: login.php"); //instrukcja do przekierowania
 }
+
 $user = User::getUserById($conn, $_SESSION['loggedUserId']);
 $userName = $user->getFullName();
 $userId = $_SESSION['loggedUserId'];
@@ -29,21 +30,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && ($_POST['submit'])){
     $senderId = isset($_SESSION['loggedUserId']) ? (int)$_SESSION['loggedUserId'] : "-1";
     $receiverId = isset($_POST['receiverId']) ? (int)$_POST['receiverId'] : -1;
     $message = isset($_POST['message']) ? $_POST['message'] : "";
+    $date = date('Y-m-d H-i-s');
     
-    if(isset($senderId) && isset($receiverId) && isset($message) && $senderId !== $receiverId){
+    if(isset($senderId) && isset($receiverId) && isset($message) && ($senderId !== $receiverId)){
         
         $newMessage = new Message();
         $newMessage->setSenderId($senderId);
         $newMessage->setReceiverId($receiverId);
         $newMessage->setMessage($message);
+        $newMessage->setDate($date);
         
-
+        
         if($newMessage->saveMessageToDB($conn)){
-              
-            
+   
             header("index.php");                                    
-            echo "Message has been sent";        
-            
+            echo "Message has been sent";         
         }
         else{
             echo "Such user does not exist";
@@ -52,7 +53,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && ($_POST['submit'])){
     else{
         echo "You cannot send message to yourself";
     }
-
 }
 
 ?>
@@ -124,7 +124,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && ($_POST['submit'])){
 
 </body>
 </html>
-
+<?php
+  
+  $conn->close();
+  $conn = null;
+  
+?>
 
 
   
